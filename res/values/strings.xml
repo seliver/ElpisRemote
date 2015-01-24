@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">ElpisRemote</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="ip_port_label">Your IP/Port</string>
+    <string name="ip_port">http://192.168.1.64:8080</string>
+    <string name="play_button_string">Playing</string>
+    <string name="pause_button_string">Paused</string>
+    <string name="next_button_string">Next</string>
+    <string name="like_button_string">Like</string>
+    <string name="liked_button_string">Liked</string>
+    <string name="dislike_button_string">Dislike</string>
+    <string name="menu_song_update">Update Song Info</string>
+
+</resources>
