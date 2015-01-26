@@ -5,7 +5,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="ip_port_label">Your IP/Port</string>
-    <string name="ip_port">http://192.168.1.64:8080</string>
+    <string name="ip_port">http://192.168.1.64:35747</string>
     <string name="play_button_string">Playing</string>
     <string name="pause_button_string">Paused</string>
     <string name="next_button_string">Next</string>

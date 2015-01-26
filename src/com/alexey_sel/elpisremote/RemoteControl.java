@@ -199,15 +199,18 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				JSONObject station = jsonObj.getJSONObject("Station");
 				if (station.getBoolean("SkipLimitReached")) {
 					new AlertDialog.Builder(this)
-				    .setTitle("The Box is Open")
-				    .setMessage("Ups, the Skip Limit Was Reached...You're screwed.")
-				    .setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-				        public void onClick(DialogInterface dialog, int which) { 
-				        	dialog.cancel();
-				        }
-				     })
-				    .setIcon(android.R.drawable.ic_dialog_alert)
-				     .show();
+							.setTitle("The Box is Open")
+							.setMessage(
+									"Ups, the Skip Limit Was Reached...You're screwed.")
+							.setPositiveButton(android.R.string.ok,
+									new DialogInterface.OnClickListener() {
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.cancel();
+										}
+									})
+							.setIcon(android.R.drawable.ic_dialog_alert).show();
 				} else {
 					if (!jsonObj.getString("AmazonTrackID").equals(
 							currentSongAmazonID)
@@ -233,7 +236,12 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			}
 			break;
 		}
-		case "next":
+		case "next":{
+			Toast.makeText(getApplicationContext(), output, Toast.LENGTH_LONG)
+			.show();
+			getCurrentSong();
+			break;
+		}
 		case "dislike": {
 			getCurrentSong();
 			break;
