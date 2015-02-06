@@ -25,11 +25,12 @@
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/textView"
         android:layout_alignBottom="@+id/textView"
-        android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/textView"
         android:ems="10"
-        android:inputType="text"
-        android:text="@string/ip_port" />
+        android:inputType="phone"
+        android:text="@string/ip_port"
+        android:imeActionLabel="Set IP"
+        android:imeActionId="123" />
 
     <TextView
         android:id="@+id/songAndArtist"
@@ -90,5 +91,12 @@
         android:layout_alignBottom="@+id/buttonPlay"
         android:layout_alignRight="@+id/coverImage"
         android:text="@string/next_button_string" />
+
+    <ProgressBar
+        android:id="@+id/ProgressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/ipandportvalue" />
 
 </RelativeLayout>

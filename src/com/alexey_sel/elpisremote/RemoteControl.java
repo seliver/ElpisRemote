@@ -8,13 +8,16 @@ import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
@@ -24,6 +27,9 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -46,6 +52,9 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	Button dislike;
 	public AsyncResponse handler;
 	boolean forceUpdate = false;
+	boolean connected = false;
+	ProgressBar progressBar;
+	String ip;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -58,7 +67,9 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		currentSongAmazonID = "";
 		ipport = (EditText) findViewById(R.id.ipandportvalue);
 		songAndArtist = (TextView) findViewById(R.id.songAndArtist);
+		progressBar = (ProgressBar) findViewById(R.id.ProgressBar);
 		handler = this;
+		ip = ipport.getText().toString();
 		play.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -74,6 +85,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		next.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				showProgressBar();
 				new RequestTask().execute("next", new String());
 			}
 		});
@@ -89,7 +101,17 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				new RequestTask().execute("dislike", new String());
 			}
 		});
-		getCurrentSong();
+		ipport.setOnEditorActionListener(new OnEditorActionListener() {
+			
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if(actionId==123){
+					ip = ipport.getText().toString();
+					Log.d("Setting ip", ip);
+				}
+				return false;
+			}
+		});
 		ScheduledExecutorService scheduler = Executors
 				.newSingleThreadScheduledExecutor();
 
@@ -99,6 +121,31 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			}
 		}, 0, 10, TimeUnit.SECONDS);
 
+		scheduler.scheduleAtFixedRate(new Runnable() {
+			public void run() {
+				if (!connected){
+					showProgressBar();
+					connect();
+				}else{
+					hideProgressBar();
+				}
+			}
+		}, 0, 2, TimeUnit.SECONDS);
+
+	}
+
+	public void showProgressBar() {
+		if (progressBar.getVisibility() != View.VISIBLE)
+			progressBar.setVisibility(View.VISIBLE);
+	}
+
+	public void hideProgressBar() {
+		if (progressBar.getVisibility() == View.VISIBLE)
+			progressBar.setVisibility(View.GONE);
+	}
+
+	public void connect() {
+		new RequestTask().execute("connect", new String());
 	}
 
 	public void getCurrentSong() {
@@ -130,40 +177,58 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		}
 	}
 
+	public String getIPPort() {
+		String address = Constants.PREFIX + ip
+				+ Constants.IP_PORT_SEPARATOR + Constants.PORT;
+		//Log.d("address", address);
+		return address;
+	}
+
 	class RequestTask extends AsyncTask<String, String, String> {
 		public String command = null;
 
 		@Override
 		protected String doInBackground(String... uri) {
-			HttpClient httpclient = new DefaultHttpClient();
-			HttpResponse response;
 			this.command = uri[0];
-			String responseString = uri[1];
-			try {
-				response = httpclient.execute(new HttpGet(ipport.getText()
-						.toString() + "/" + uri[0]));
-				StatusLine statusLine = response.getStatusLine();
-				if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
-					ByteArrayOutputStream out = new ByteArrayOutputStream();
-					response.getEntity().writeTo(out);
-					responseString = out.toString();
-					out.close();
-				} else {
-					// Closes the connection.
-					response.getEntity().getContent().close();
-					throw new IOException(statusLine.getReasonPhrase());
+			if (connected || command.equals("connect")) {
+				Log.d("Command:ip", command+":"+ip);
+				HttpParams httpParams = new BasicHttpParams();
+			    HttpConnectionParams.setConnectionTimeout(httpParams, 100);
+				HttpClient httpclient = new DefaultHttpClient(httpParams);
+				HttpResponse response;
+				
+				String responseString = uri[1];
+				try {
+					response = httpclient.execute(new HttpGet(getIPPort() + "/"
+							+ uri[0]));
+					StatusLine statusLine = response.getStatusLine();
+					if (statusLine.getStatusCode() == HttpStatus.SC_OK) {
+						ByteArrayOutputStream out = new ByteArrayOutputStream();
+						response.getEntity().writeTo(out);
+						responseString = out.toString();
+						out.close();
+					} else {
+						// Closes the connection.
+						response.getEntity().getContent().close();
+						throw new IOException(statusLine.getReasonPhrase());
+					}
+				} catch (ClientProtocolException e) {
+					return null;
+				} catch (IOException e) {
+					return null;
 				}
-			} catch (ClientProtocolException e) {
-				// TODO Handle problems..
-			} catch (IOException e) {
-				// TODO Handle problems..
+				return responseString;
+			} else {
+				showProgressBar();
+				return null;
 			}
-			return responseString;
 		}
 
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
+			if (result == null)
+				result = "";
 			handler.processFinish(result, this.command);
 		}
 	}
@@ -192,74 +257,84 @@ public class RemoteControl extends Activity implements AsyncResponse {
 
 	@Override
 	public void processFinish(String output, String command) {
-		switch (command) {
-		case "currentsong": {
-			try {
-				JSONObject jsonObj = new JSONObject(output);
-				JSONObject station = jsonObj.getJSONObject("Station");
-				if (station.getBoolean("SkipLimitReached")) {
-					new AlertDialog.Builder(this)
-							.setTitle("The Box is Open")
-							.setMessage(
-									"Ups, the Skip Limit Was Reached...You're screwed.")
-							.setPositiveButton(android.R.string.ok,
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											dialog.cancel();
-										}
-									})
-							.setIcon(android.R.drawable.ic_dialog_alert).show();
-				} else {
-					if (!jsonObj.getString("AmazonTrackID").equals(
-							currentSongAmazonID)
-							|| forceUpdate) {
-						forceUpdate = false;
-						new DownloadImageTask(
-								(ImageView) findViewById(R.id.coverImage))
-								.execute(jsonObj.getString("AlbumArtUrl"));
-						songAndArtist.setText(jsonObj.getString("SongTitle")
-								+ " by " + jsonObj.getString("Artist"));
-						currentSongAmazonID = jsonObj
-								.getString("AmazonTrackID");
-						boolean liked = jsonObj.getBoolean("Loved");
-						if (liked) {
-							like.setText(R.string.liked_button_string);
-						} else {
-							like.setText(R.string.like_button_string);
+		if (connected || command.equals("connect")) {
+			switch (command) {
+			case "currentsong": {
+				try {
+					JSONObject jsonObj = new JSONObject(output);
+					JSONObject station = jsonObj.getJSONObject("Station");
+					if (station.getBoolean("SkipLimitReached")) {
+						new AlertDialog.Builder(this)
+								.setTitle("The Box is Open")
+								.setMessage(
+										"Ups, the Skip Limit Was Reached...You're screwed.")
+								.setPositiveButton(android.R.string.ok,
+										new DialogInterface.OnClickListener() {
+											public void onClick(
+													DialogInterface dialog,
+													int which) {
+												dialog.cancel();
+											}
+										})
+								.setIcon(android.R.drawable.ic_dialog_alert)
+								.show();
+					} else {
+						if (!jsonObj.getString("AmazonTrackID").equals(
+								currentSongAmazonID)
+								|| forceUpdate) {
+							forceUpdate = false;
+							new DownloadImageTask(
+									(ImageView) findViewById(R.id.coverImage))
+									.execute(jsonObj.getString("AlbumArtUrl"));
+							songAndArtist.setText(jsonObj
+									.getString("SongTitle")
+									+ " by "
+									+ jsonObj.getString("Artist"));
+							currentSongAmazonID = jsonObj
+									.getString("AmazonTrackID");
+							boolean liked = jsonObj.getBoolean("Loved");
+							if (liked) {
+								like.setText(R.string.liked_button_string);
+							} else {
+								like.setText(R.string.like_button_string);
+							}
 						}
 					}
+				} catch (JSONException e) {
+					e.printStackTrace();
 				}
-			} catch (JSONException e) {
-				e.printStackTrace();
+				break;
 			}
-			break;
-		}
-		case "next":{
-			Toast.makeText(getApplicationContext(), output, Toast.LENGTH_LONG)
-			.show();
-			getCurrentSong();
-			break;
-		}
-		case "dislike": {
-			getCurrentSong();
-			break;
-		}
-		case "like": {
-			if (output.equals("Like")) {
-				like.setText(R.string.liked_button_string);
-			} else {
-				like.setText(R.string.like_button_string);
+			case "next": {
+				Toast.makeText(getApplicationContext(), output,
+						Toast.LENGTH_LONG).show();
+				getCurrentSong();
+				break;
 			}
-			break;
-		}
-
-		default: {
-			Toast.makeText(getApplicationContext(), output, Toast.LENGTH_LONG)
-					.show();
-			break;
-		}
+			case "dislike": {
+				getCurrentSong();
+				break;
+			}
+			case "like": {
+				if (output.equals("Like")) {
+					like.setText(R.string.liked_button_string);
+				} else {
+					like.setText(R.string.like_button_string);
+				}
+				break;
+			}
+			case "connect": {
+				if (output.equals("true")) {
+					connected = true;
+				}
+				break;
+			}
+			default: {
+				Toast.makeText(getApplicationContext(), output,
+						Toast.LENGTH_LONG).show();
+				break;
+			}
+			}
 		}
 	}
 }
