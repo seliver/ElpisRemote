@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -61,24 +62,15 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	Button next;
 	Button like;
 	Button dislike;
-	Button playSong;
 	public AsyncResponse handler;
 	boolean forceUpdate = false;
 	boolean connected = false;
 	ProgressBar progressBar;
 	String ip;
 	VideoView mVideoView;
+	MediaPlayer player;
 	Context t;
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-	    super.onSaveInstanceState(outState);
-	    int stopPosition = mVideoView.getCurrentPosition(); 
-	    mVideoView.seekTo(stopPosition);
-	    mVideoView.start();
-	    outState.putInt("position", stopPosition);
-	} 
-	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -88,7 +80,6 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		next = (Button) findViewById(R.id.buttonNext);
 		like = (Button) findViewById(R.id.buttonLike);
 		dislike = (Button) findViewById(R.id.buttonDislike);
-		playSong = (Button) findViewById(R.id.playSong);
 		currentSongAmazonID = "";
 		ipport = (EditText) findViewById(R.id.ipandportvalue);
 		songAndArtist = (TextView) findViewById(R.id.songAndArtist);
@@ -96,34 +87,20 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		handler = this;
 		ip = ipport.getText().toString();
 		
-		mVideoView = (VideoView) findViewById(R.id.videoView1);
-		mVideoView.setMediaController(new MediaController(this));
-		playSong.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				// this plays the song on a videoview. bam!
-				Uri video = Uri.parse(URL);
-				mVideoView.setVideoURI(video);
-				mVideoView.start();
-				
-				/*
-				 * This is the code to run VLC to play the song.
-				Intent intent = new Intent(Intent.ACTION_VIEW);
-				intent.setPackage("org.videolan.vlc.betav7neon");
-				intent.setDataAndType(Uri.parse(URL), "application/mp4");
-				startActivity(intent);*/
-			}
-		});
+		//mVideoView = (VideoView) findViewById(R.id.videoView1);
+		//mVideoView.setMediaController(new MediaController(this));
+		player = new MediaPlayer();
 		play.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (play.getText().equals("Playing")) {
 					new RequestTask().execute("pause", new String());
 					play.setText(R.string.pause_button_string);
+					player.pause();
 				} else {
 					new RequestTask().execute("play", new String());
 					play.setText(R.string.play_button_string);
+					player.start();
 				}
 			}
 		});
@@ -181,9 +158,24 @@ public class RemoteControl extends Activity implements AsyncResponse {
 
 	public void playSong(){
 		// this plays the song on a videoview. bam!
-		Uri video = Uri.parse(URL);
+		/*Uri video = Uri.parse(URL);
 		mVideoView.setVideoURI(video);
-		mVideoView.start();
+		mVideoView.start();*/
+		
+		try {
+			player.stop();
+			player.release();
+			player = new MediaPlayer();
+			player.setDataSource(URL);
+			player.prepare();
+			player.start();
+		} catch (IllegalArgumentException | SecurityException
+				| IllegalStateException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
 		
 		/*
 		 * This is the code to run VLC to play the song.

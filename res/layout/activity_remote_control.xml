@@ -26,7 +26,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/textView"
-        android:layout_alignRight="@+id/ipandportvalue"
+        android:layout_alignRight="@+id/ProgressBar"
         android:layout_below="@+id/ipandportvalue"
         android:layout_marginTop="25dp"
         android:text="Song Name and Artist"
@@ -100,20 +100,5 @@
         android:layout_marginTop="33dp"
         android:text="@string/ip_port_label"
         android:textStyle="bold" />
-
-    <Button
-        android:id="@+id/playSong"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_below="@+id/buttonNext"
-        android:text="Play" />
-
-    <VideoView
-        android:id="@+id/videoView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignRight="@+id/textView"
-        android:layout_below="@+id/songAndArtist" />
 
 </RelativeLayout>
