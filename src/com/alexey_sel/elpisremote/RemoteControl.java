@@ -2,9 +2,16 @@ package com.alexey_sel.elpisremote;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,13 +19,16 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -45,31 +55,66 @@ import java.util.concurrent.TimeUnit;
 public class RemoteControl extends Activity implements AsyncResponse {
 	EditText ipport;
 	String currentSongAmazonID;
+	String URL;
 	TextView songAndArtist;
 	Button play;
 	Button next;
 	Button like;
 	Button dislike;
+	Button playSong;
 	public AsyncResponse handler;
 	boolean forceUpdate = false;
 	boolean connected = false;
 	ProgressBar progressBar;
 	String ip;
+	VideoView mVideoView;
+	Context t;
 
+	@Override
+	public void onSaveInstanceState(Bundle outState) {
+	    super.onSaveInstanceState(outState);
+	    int stopPosition = mVideoView.getCurrentPosition(); 
+	    mVideoView.seekTo(stopPosition);
+	    mVideoView.start();
+	    outState.putInt("position", stopPosition);
+	} 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		t = this;
 		setContentView(R.layout.activity_remote_control);
 		play = (Button) findViewById(R.id.buttonPlay);
 		next = (Button) findViewById(R.id.buttonNext);
 		like = (Button) findViewById(R.id.buttonLike);
 		dislike = (Button) findViewById(R.id.buttonDislike);
+		playSong = (Button) findViewById(R.id.playSong);
 		currentSongAmazonID = "";
 		ipport = (EditText) findViewById(R.id.ipandportvalue);
 		songAndArtist = (TextView) findViewById(R.id.songAndArtist);
 		progressBar = (ProgressBar) findViewById(R.id.ProgressBar);
 		handler = this;
 		ip = ipport.getText().toString();
+		
+		mVideoView = (VideoView) findViewById(R.id.videoView1);
+		mVideoView.setMediaController(new MediaController(this));
+		playSong.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// this plays the song on a videoview. bam!
+				Uri video = Uri.parse(URL);
+				mVideoView.setVideoURI(video);
+				mVideoView.start();
+				
+				/*
+				 * This is the code to run VLC to play the song.
+				Intent intent = new Intent(Intent.ACTION_VIEW);
+				intent.setPackage("org.videolan.vlc.betav7neon");
+				intent.setDataAndType(Uri.parse(URL), "application/mp4");
+				startActivity(intent);*/
+			}
+		});
 		play.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -134,6 +179,20 @@ public class RemoteControl extends Activity implements AsyncResponse {
 
 	}
 
+	public void playSong(){
+		// this plays the song on a videoview. bam!
+		Uri video = Uri.parse(URL);
+		mVideoView.setVideoURI(video);
+		mVideoView.start();
+		
+		/*
+		 * This is the code to run VLC to play the song.
+		Intent intent = new Intent(Intent.ACTION_VIEW);
+		intent.setPackage("org.videolan.vlc.betav7neon");
+		intent.setDataAndType(Uri.parse(URL), "application/mp4");
+		startActivity(intent);*/
+	}
+	
 	public void showProgressBar() {
 		if (progressBar.getVisibility() != View.VISIBLE)
 			progressBar.setVisibility(View.VISIBLE);
@@ -248,8 +307,6 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			forceUpdate = true;
 			getActionBar();
 			return true;
-		case R.id.action_settings:
-			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -298,6 +355,8 @@ public class RemoteControl extends Activity implements AsyncResponse {
 							} else {
 								like.setText(R.string.like_button_string);
 							}
+							URL = jsonObj.getString("AudioUrl");
+							playSong();
 						}
 					}
 				} catch (JSONException e) {
