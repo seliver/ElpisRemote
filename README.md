@@ -10,6 +10,7 @@ It is built on Java using the [Eclipse](https://eclipse.org/) IDE.
  * Basic controls, like **Play/Pause**, **Like/Dislike** and **Skip**
  * Allows the user to see onscreen what's the song that is playing
  * Allows the user to see the state of the song (is Playing or is Paused, is Liked), being this information synced every 10 seconds.
+ * Listen to what's playing on your PC on the Phone
 
 ## Requirements
  * Minimum SDK version - 15 (Android 4.0.3)
