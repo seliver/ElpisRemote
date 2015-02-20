@@ -2,5 +2,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.alexey_sel.elpisremote.RemoteControl" >
     <item android:id="@+id/updateSongInfo" android:title="@string/menu_song_update" android:showAsAction="never"></item>
-
+	<item android:id="@+id/listen" 
+         android:titleCondensed="Listen Here"
+         android:title="Listen what's playing on Elpis Here" 
+         android:icon="@android:drawable/ic_menu_preferences" 
+         android:checkable="true" />
 </menu>

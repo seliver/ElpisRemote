@@ -70,6 +70,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	VideoView mVideoView;
 	MediaPlayer player;
 	Context t;
+	boolean listen;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -86,9 +87,9 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		progressBar = (ProgressBar) findViewById(R.id.ProgressBar);
 		handler = this;
 		ip = ipport.getText().toString();
-		
-		//mVideoView = (VideoView) findViewById(R.id.videoView1);
-		//mVideoView.setMediaController(new MediaController(this));
+		listen = false;
+		// mVideoView = (VideoView) findViewById(R.id.videoView1);
+		// mVideoView.setMediaController(new MediaController(this));
 		player = new MediaPlayer();
 		play.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -96,11 +97,11 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				if (play.getText().equals("Playing")) {
 					new RequestTask().execute("pause", new String());
 					play.setText(R.string.pause_button_string);
-					player.pause();
+					pausePlaying();
 				} else {
 					new RequestTask().execute("play", new String());
 					play.setText(R.string.play_button_string);
-					player.start();
+					continuePlaying();
 				}
 			}
 		});
@@ -124,10 +125,11 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			}
 		});
 		ipport.setOnEditorActionListener(new OnEditorActionListener() {
-			
+
 			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if(actionId==123){
+			public boolean onEditorAction(TextView v, int actionId,
+					KeyEvent event) {
+				if (actionId == 123) {
 					ip = ipport.getText().toString();
 					Log.d("Setting ip", ip);
 				}
@@ -145,10 +147,10 @@ public class RemoteControl extends Activity implements AsyncResponse {
 
 		scheduler.scheduleAtFixedRate(new Runnable() {
 			public void run() {
-				if (!connected){
+				if (!connected) {
 					showProgressBar();
 					connect();
-				}else{
+				} else {
 					hideProgressBar();
 				}
 			}
@@ -156,35 +158,52 @@ public class RemoteControl extends Activity implements AsyncResponse {
 
 	}
 
-	public void playSong(){
-		// this plays the song on a videoview. bam!
-		/*Uri video = Uri.parse(URL);
-		mVideoView.setVideoURI(video);
-		mVideoView.start();*/
-		
-		try {
-			player.stop();
-			player.release();
-			player = new MediaPlayer();
-			player.setDataSource(URL);
-			player.prepare();
-			player.start();
-		} catch (IllegalArgumentException | SecurityException
-				| IllegalStateException | IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+	public void pausePlaying() {
+		if (listen){
+			player.pause();
 		}
-		
-		
-		
-		/*
-		 * This is the code to run VLC to play the song.
-		Intent intent = new Intent(Intent.ACTION_VIEW);
-		intent.setPackage("org.videolan.vlc.betav7neon");
-		intent.setDataAndType(Uri.parse(URL), "application/mp4");
-		startActivity(intent);*/
+	}
+
+	public void continuePlaying() {
+		if (listen){
+			player.start();
+		}
+	}
+
+	public void stopSong(){
+		player.stop();
 	}
 	
+	public void playSong() {
+		// this plays the song on a videoview. bam!
+		/*
+		 * Uri video = Uri.parse(URL); mVideoView.setVideoURI(video);
+		 * mVideoView.start();
+		 */
+		if (listen) {
+			try {
+				player.stop();
+				player.release();
+				player = new MediaPlayer();
+				player.setDataSource(URL);
+				player.prepare();
+				player.start();
+			} catch (IllegalArgumentException | SecurityException
+					| IllegalStateException | IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		/*
+		 * This is the code to run VLC to play the song. Intent intent = new
+		 * Intent(Intent.ACTION_VIEW);
+		 * intent.setPackage("org.videolan.vlc.betav7neon");
+		 * intent.setDataAndType(Uri.parse(URL), "application/mp4");
+		 * startActivity(intent);
+		 */
+	}
+
 	public void showProgressBar() {
 		if (progressBar.getVisibility() != View.VISIBLE)
 			progressBar.setVisibility(View.VISIBLE);
@@ -229,9 +248,9 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	}
 
 	public String getIPPort() {
-		String address = Constants.PREFIX + ip
-				+ Constants.IP_PORT_SEPARATOR + Constants.PORT;
-		//Log.d("address", address);
+		String address = Constants.PREFIX + ip + Constants.IP_PORT_SEPARATOR
+				+ Constants.PORT;
+		// Log.d("address", address);
 		return address;
 	}
 
@@ -242,12 +261,12 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		protected String doInBackground(String... uri) {
 			this.command = uri[0];
 			if (connected || command.equals("connect")) {
-				Log.d("Command:ip", command+":"+ip);
+				Log.d("Command:ip", command + ":" + ip);
 				HttpParams httpParams = new BasicHttpParams();
-			    HttpConnectionParams.setConnectionTimeout(httpParams, 100);
+				HttpConnectionParams.setConnectionTimeout(httpParams, 100);
 				HttpClient httpclient = new DefaultHttpClient(httpParams);
 				HttpResponse response;
-				
+
 				String responseString = uri[1];
 				try {
 					response = httpclient.execute(new HttpGet(getIPPort() + "/"
@@ -298,6 +317,14 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		case R.id.updateSongInfo:
 			forceUpdate = true;
 			getActionBar();
+			return true;
+		case R.id.listen:
+			listen = !item.isChecked();
+			item.setChecked(!item.isChecked());
+			if (listen)
+				playSong();
+			else
+				stopSong();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
