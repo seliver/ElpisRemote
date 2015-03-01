@@ -108,7 +108,6 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		next.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				showProgressBar();
 				new RequestTask().execute("next", new String());
 			}
 		});
@@ -159,21 +158,21 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	}
 
 	public void pausePlaying() {
-		if (listen){
+		if (listen) {
 			player.pause();
 		}
 	}
 
 	public void continuePlaying() {
-		if (listen){
+		if (listen) {
 			player.start();
 		}
 	}
 
-	public void stopSong(){
+	public void stopSong() {
 		player.stop();
 	}
-	
+
 	public void playSong() {
 		// this plays the song on a videoview. bam!
 		/*
@@ -205,13 +204,28 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	}
 
 	public void showProgressBar() {
-		if (progressBar.getVisibility() != View.VISIBLE)
-			progressBar.setVisibility(View.VISIBLE);
+		if (progressBar.getVisibility() != View.VISIBLE) {
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					progressBar.setVisibility(View.VISIBLE);
+				}
+			});
+
+		}
 	}
 
 	public void hideProgressBar() {
 		if (progressBar.getVisibility() == View.VISIBLE)
-			progressBar.setVisibility(View.GONE);
+			runOnUiThread(new Runnable() {
+
+				@Override
+				public void run() {
+					progressBar.setVisibility(View.GONE);
+				}
+			});
+
 	}
 
 	public void connect() {
@@ -337,6 +351,9 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			switch (command) {
 			case "currentsong": {
 				try {
+					if (output.equals("")) {
+						connected = false;
+					}
 					JSONObject jsonObj = new JSONObject(output);
 					JSONObject station = jsonObj.getJSONObject("Station");
 					if (station.getBoolean("SkipLimitReached")) {
