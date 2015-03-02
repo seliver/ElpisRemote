@@ -13,5 +13,10 @@
     <string name="liked_button_string">Liked</string>
     <string name="dislike_button_string">Dislike</string>
     <string name="menu_song_update">Update Song Info</string>
+    <string name="liste_label_long">Listen what\'s playing on Elpis</string>
+    <string name="about_label">About</string>
+    <string name="first_run_text">Thanks for using ElpisRemote. \nPlease do report any bugs you find at \nhttps://github.com/seliver/ElpisRemote</string>
+    <string name="about_text">Thanks for using ElpisRemote. \nIf you have found a bug or have a suggestion, please create a new issue at \nhttps://github.com/seliver/ElpisRemote </string>
+    <string name="about_title">© Alexey Seliverstov - 2015</string>
 
 </resources>

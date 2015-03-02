@@ -4,7 +4,8 @@
     <item android:id="@+id/updateSongInfo" android:title="@string/menu_song_update" android:showAsAction="never"></item>
 	<item android:id="@+id/listen" 
          android:titleCondensed="Listen Here"
-         android:title="Listen what's playing on Elpis Here" 
+         android:title="@string/liste_label_long" 
          android:icon="@android:drawable/ic_menu_preferences" 
          android:checkable="true" />
+	<item android:id="@+id/aboutPopup" android:title="@string/about_label" android:showAsAction="never"></item>
 </menu>

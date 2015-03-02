@@ -9,11 +9,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -33,11 +35,15 @@ import android.widget.VideoView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
@@ -49,9 +55,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RemoteControl extends Activity implements AsyncResponse {
 	EditText ipport;
@@ -91,6 +101,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		// mVideoView = (VideoView) findViewById(R.id.videoView1);
 		// mVideoView.setMediaController(new MediaController(this));
 		player = new MediaPlayer();
+		checkFirstRun();
 		play.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -155,6 +166,31 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			}
 		}, 0, 2, TimeUnit.SECONDS);
 
+	}
+
+	public void checkFirstRun() {
+		boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+				.getBoolean("isFirstRun", true);
+		if (isFirstRun) {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			// Add the buttons
+			builder.setPositiveButton("Ok",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// User clicked OK button
+						}
+					});
+			builder.setMessage(R.string.first_run_text);
+
+			// Create the AlertDialog
+			AlertDialog dialog = builder.create();
+			dialog.show();
+
+			if (Statistics.sendAnonymousStatistics(this))
+				getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+						.putBoolean("isFirstRun", false).apply();
+		}
 	}
 
 	public void pausePlaying() {
@@ -339,6 +375,33 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				playSong();
 			else
 				stopSong();
+			return true;
+		case R.id.aboutPopup:
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			// Add the buttons
+			builder.setPositiveButton("Close",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// User clicked OK button
+						}
+					});
+			builder.setNeutralButton("Report Bug",
+					new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							Intent browserIntent = new Intent(
+									Intent.ACTION_VIEW,
+									Uri.parse(Constants.PROJECT_GITHUB_URL));
+							startActivity(browserIntent);
+						}
+					});
+			builder.setMessage(R.string.about_text);
+			builder.setTitle(R.string.about_title);
+
+			// Create the AlertDialog
+			AlertDialog dialog = builder.create();
+			dialog.show();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
