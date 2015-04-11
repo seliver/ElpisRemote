@@ -1,103 +1,181 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/LinearLayout1"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingBottom="@dimen/activity_vertical_margin"
-    android:paddingLeft="@dimen/activity_horizontal_margin"
-    android:paddingRight="@dimen/activity_horizontal_margin"
-    android:paddingTop="@dimen/activity_vertical_margin"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:paddingBottom="30dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
+    android:paddingTop="30dp"
     tools:context=".RemoteControl" >
 
-    <EditText
-        android:id="@+id/ipandportvalue"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/textView"
-        android:layout_alignBottom="@+id/textView"
-        android:layout_toRightOf="@+id/textView"
-        android:ems="10"
-        android:inputType="phone"
-        android:text="@string/ip_port"
-        android:imeActionLabel="Set IP"
-        android:imeActionId="123" />
+        android:layout_weight="0.10"
+        android:divider="@layout/empty_tall_divider"
+        android:gravity="center"
+        android:showDividers="middle" >
 
-    <TextView
-        android:id="@+id/songAndArtist"
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/ip_port_label"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/ipandportvalue"
+            android:layout_width="159dp"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="phone"
+            android:text="@string/ip_port" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical" >
+
+            <ProgressBar
+                android:id="@+id/ProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:layout_weight="0.10"
+        android:gravity="center"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/songAndArtist"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Song Name and Artist"
+            android:textAppearance="?android:attr/textAppearanceMedium" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="240dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignRight="@+id/ProgressBar"
-        android:layout_below="@+id/ipandportvalue"
-        android:layout_marginTop="25dp"
-        android:text="Song Name and Artist"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_weight="0.10"
+        android:gravity="center"
+        android:orientation="vertical" >
 
-    <ImageView
-        android:id="@+id/coverImage"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
-        android:layout_alignLeft="@+id/ipandportvalue"
-        android:layout_below="@+id/songAndArtist"
-        android:layout_marginTop="16dp"
-        android:maxHeight="@android:dimen/thumbnail_height"
-        android:maxWidth="@android:dimen/thumbnail_width"
-        android:src="@drawable/ic_launcher" />
+        <ImageView
+            android:id="@+id/coverImage"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:maxHeight="@android:dimen/thumbnail_height"
+            android:maxWidth="@android:dimen/thumbnail_width"
+            android:src="@drawable/ic_launcher" />
+    </LinearLayout>
 
-    <Button
-        android:id="@+id/buttonLike"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="204dp"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/buttonPlay"
-        android:layout_alignRight="@+id/buttonPlay"
-        android:layout_alignStart="@+id/buttonNext"
-        android:layout_below="@+id/buttonPlay"
-        android:layout_marginTop="30dp"
-        android:text="@string/like_button_string" />
+        android:layout_weight="0.11"
+        android:gravity="center_horizontal" >
 
-    <Button
-        android:id="@+id/buttonDislike"
-        android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.50"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/buttonPlay"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/play_button_string" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="right"
+            android:layout_weight="0.50"
+            android:gravity="right"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/buttonNext"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/next_button_string" />
+        </LinearLayout>
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="197dp"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/buttonLike"
-        android:layout_alignBottom="@+id/buttonLike"
-        android:layout_alignRight="@+id/coverImage"
-        android:text="@string/dislike_button_string" />
+        android:layout_margin="7dp"
+        android:layout_weight="0.10"
+        android:divider="@layout/empty_tall_divider"
+        android:dividerPadding="5dp"
+        android:gravity="center_horizontal|fill_horizontal" >
 
-    <Button
-        android:id="@+id/buttonPlay"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/coverImage"
-        android:layout_marginTop="18dp"
-        android:layout_toLeftOf="@+id/buttonDislike"
-        android:text="@string/play_button_string" />
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
 
-    <Button
-        android:id="@+id/buttonNext"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/buttonPlay"
-        android:layout_alignBottom="@+id/buttonPlay"
-        android:layout_alignRight="@+id/coverImage"
-        android:text="@string/next_button_string" />
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
 
-    <ProgressBar
-        android:id="@+id/ProgressBar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/ipandportvalue" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1.53"
+            android:gravity="left"
+            android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="22dp"
-        android:layout_marginTop="33dp"
-        android:text="@string/ip_port_label"
-        android:textStyle="bold" />
+            <Button
+                android:id="@+id/buttonLike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/like_button_string" />
+        </LinearLayout>
 
-</RelativeLayout>
+        <LinearLayout
+            android:layout_width="104dp"
+            android:layout_height="match_parent"
+            android:gravity="right"
+            android:orientation="vertical" >
+
+            <Button
+                android:id="@+id/buttonDislike"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/dislike_button_string" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

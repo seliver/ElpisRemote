@@ -20,7 +20,7 @@ import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 
 public class Statistics {
-	static boolean OFF = true;
+	static boolean OFF = false;
 	public static boolean sendAnonymousStatistics(Context c) {
 		if (OFF)
 			return true;
@@ -46,7 +46,7 @@ public class Statistics {
 	        public void run() {
 	        	HttpClient httpclient = new DefaultHttpClient();
 	    		HttpPost httppost = new HttpPost(
-	    				"");
+	    				"http://paginas.fe.up.pt/~ei10063/elpis/stats.php");
 
 	    		try {
 	    			// Add your data

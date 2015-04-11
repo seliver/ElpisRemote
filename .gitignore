@@ -6,6 +6,9 @@
 # bin directory
 bin/*
 
+# proguard directory
+proguard/*
+
 # Package Files #
 *.jar
 *.war

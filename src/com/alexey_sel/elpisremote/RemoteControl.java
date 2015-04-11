@@ -2,31 +2,23 @@ package com.alexey_sel.elpisremote;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
@@ -35,33 +27,23 @@ import android.widget.VideoView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class RemoteControl extends Activity implements AsyncResponse {
 	EditText ipport;
@@ -134,6 +116,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				new RequestTask().execute("dislike", new String());
 			}
 		});
+		ipport.setImeActionLabel("Set IP", 123);
 		ipport.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
@@ -142,6 +125,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				if (actionId == 123) {
 					ip = ipport.getText().toString();
 					Log.d("Setting ip", ip);
+					connect();
 				}
 				return false;
 			}
@@ -258,7 +242,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 
 				@Override
 				public void run() {
-					progressBar.setVisibility(View.GONE);
+					progressBar.setVisibility(View.INVISIBLE);
 				}
 			});
 
