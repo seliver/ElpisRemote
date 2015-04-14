@@ -116,13 +116,13 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				new RequestTask().execute("dislike", new String());
 			}
 		});
-		ipport.setImeActionLabel("Set IP", 123);
+		ipport.setImeActionLabel("Set IP", KeyEvent.KEYCODE_ENTER);
 		ipport.setOnEditorActionListener(new OnEditorActionListener() {
 
 			@Override
 			public boolean onEditorAction(TextView v, int actionId,
 					KeyEvent event) {
-				if (actionId == 123) {
+				if (actionId == KeyEvent.KEYCODE_ENTER) {
 					ip = ipport.getText().toString();
 					Log.d("Setting ip", ip);
 					connect();
