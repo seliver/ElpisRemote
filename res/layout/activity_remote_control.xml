@@ -12,6 +12,28 @@
     tools:context=".RemoteControl" >
 
     <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="26dp"
+        android:gravity="center_vertical|center_horizontal"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/LoadingSongText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Loading song info"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:visibility="invisible" />
+
+        <ProgressBar
+            android:id="@+id/LoadingSongPrograssBar"
+            android:layout_width="13dp"
+            android:layout_height="13dp"
+            android:visibility="invisible" />
+
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_weight="0.10"
@@ -83,10 +105,25 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="204dp"
+        android:layout_width="236dp"
         android:layout_height="wrap_content"
-        android:layout_weight="0.11"
+        android:layout_weight="0.02"
         android:gravity="center_horizontal" >
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.24"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal" >
+
+            <ProgressBar
+                android:id="@+id/playPauseProgessBar"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -104,7 +141,6 @@
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_gravity="right"
             android:layout_weight="0.50"
             android:gravity="right"
             android:orientation="vertical" >
@@ -114,6 +150,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/next_button_string" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.24"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal" >
+
+            <ProgressBar
+                android:id="@+id/nextProgressBar"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:visibility="invisible" />
+
         </LinearLayout>
     </LinearLayout>
 
@@ -134,10 +185,10 @@
         android:layout_height="wrap_content" />
 
     <LinearLayout
-        android:layout_width="197dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="7dp"
-        android:layout_weight="0.10"
+        android:layout_weight="0.02"
         android:divider="@layout/empty_tall_divider"
         android:dividerPadding="5dp"
         android:gravity="center_horizontal|fill_horizontal" >
@@ -149,6 +200,21 @@
         <Space
             android:layout_width="wrap_content"
             android:layout_height="match_parent" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.24"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal" >
+
+            <ProgressBar
+                android:id="@+id/likeProgressBar"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:visibility="invisible" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -175,6 +241,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/dislike_button_string" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.24"
+            android:gravity="center_vertical|center_horizontal"
+            android:orientation="horizontal" >
+
+            <ProgressBar
+                android:id="@+id/dislikeProgressBar"
+                android:layout_width="13dp"
+                android:layout_height="13dp"
+                android:visibility="invisible" />
+
         </LinearLayout>
     </LinearLayout>
 

@@ -64,6 +64,13 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	Context t;
 	boolean listen;
 
+	ProgressBar playPauseProgressBar;
+	ProgressBar nextProgressBar;
+	ProgressBar likeProgressBar;
+	ProgressBar dislikeProgressBar;
+	ProgressBar loadingSongProgressBar;
+	TextView loadingSongText;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,6 +84,12 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		ipport = (EditText) findViewById(R.id.ipandportvalue);
 		songAndArtist = (TextView) findViewById(R.id.songAndArtist);
 		progressBar = (ProgressBar) findViewById(R.id.ProgressBar);
+		playPauseProgressBar = (ProgressBar) findViewById(R.id.playPauseProgessBar);
+		nextProgressBar = (ProgressBar) findViewById(R.id.nextProgressBar);
+		likeProgressBar = (ProgressBar) findViewById(R.id.likeProgressBar);
+		dislikeProgressBar = (ProgressBar) findViewById(R.id.dislikeProgressBar);
+		loadingSongProgressBar = (ProgressBar) findViewById(R.id.LoadingSongPrograssBar);
+		loadingSongText = (TextView) findViewById(R.id.LoadingSongText);
 		handler = this;
 		ip = ipport.getText().toString();
 		listen = false;
@@ -101,18 +114,21 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		next.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				toggleGUIElements(true, nextProgressBar);
 				new RequestTask().execute("next", new String());
 			}
 		});
 		like.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				toggleGUIElements(true, likeProgressBar);
 				new RequestTask().execute("like", new String());
 			}
 		});
 		dislike.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
+				toggleGUIElements(true, dislikeProgressBar);
 				new RequestTask().execute("dislike", new String());
 			}
 		});
@@ -150,6 +166,23 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			}
 		}, 0, 2, TimeUnit.SECONDS);
 
+	}
+
+	public void toggleGUIElements(final boolean setAsVisible,
+			final View... views) {
+		if (views[0].getVisibility() != (setAsVisible ? View.VISIBLE
+				: View.INVISIBLE)) {
+			runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					for (View v : views) {
+						v.setVisibility(setAsVisible ? View.VISIBLE
+								: View.INVISIBLE);
+					}
+				}
+			});
+
+		}
 	}
 
 	public void checkFirstRun() {
@@ -253,6 +286,8 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	}
 
 	public void getCurrentSong() {
+		toggleGUIElements(true, loadingSongProgressBar);
+		toggleGUIElements(true, loadingSongText);
 		new RequestTask().execute("currentsong", new String());
 	}
 
@@ -398,6 +433,8 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			switch (command) {
 			case "currentsong": {
 				try {
+					toggleGUIElements(false, loadingSongProgressBar);
+					toggleGUIElements(false, loadingSongText);
 					if (output.equals("")) {
 						connected = false;
 					}
@@ -448,16 +485,19 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				break;
 			}
 			case "next": {
+				toggleGUIElements(false, nextProgressBar);
 				Toast.makeText(getApplicationContext(), output,
 						Toast.LENGTH_LONG).show();
 				getCurrentSong();
 				break;
 			}
 			case "dislike": {
+				toggleGUIElements(false, dislikeProgressBar);
 				getCurrentSong();
 				break;
 			}
 			case "like": {
+				toggleGUIElements(false, likeProgressBar);
 				if (output.equals("Like")) {
 					like.setText(R.string.liked_button_string);
 				} else {
