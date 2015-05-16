@@ -286,8 +286,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	}
 
 	public void getCurrentSong() {
-		toggleGUIElements(true, loadingSongProgressBar);
-		toggleGUIElements(true, loadingSongText);
+		toggleGUIElements(true, loadingSongProgressBar, loadingSongText);
 		new RequestTask().execute("currentsong", new String());
 	}
 
@@ -433,8 +432,6 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			switch (command) {
 			case "currentsong": {
 				try {
-					toggleGUIElements(false, loadingSongProgressBar);
-					toggleGUIElements(false, loadingSongText);
 					if (output.equals("")) {
 						connected = false;
 					}
@@ -482,6 +479,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
+				toggleGUIElements(false, loadingSongProgressBar, loadingSongText);
 				break;
 			}
 			case "next": {
