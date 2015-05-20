@@ -13,7 +13,7 @@ It is built on Java using the [Eclipse](https://eclipse.org/) IDE.
  * Listen to what's playing on your PC on the Phone
 
 ## Requirements
- * Minimum SDK version - 15 (Android 4.0.3)
+ * Minimum SDK version - 6 (Android 2.0.1)
  * Java installed on your computer to run Eclipse
  * Android Development Tools for Eclipse installed
 
