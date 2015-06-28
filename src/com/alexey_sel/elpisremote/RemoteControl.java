@@ -1,7 +1,10 @@
 package com.alexey_sel.elpisremote;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,6 +14,7 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -46,7 +50,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class RemoteControl extends Activity implements AsyncResponse {
-	EditText ipport;
+	TextView ipport;
 	String currentSongAmazonID;
 	String URL;
 	TextView songAndArtist;
@@ -70,18 +74,26 @@ public class RemoteControl extends Activity implements AsyncResponse {
 	ProgressBar dislikeProgressBar;
 	ProgressBar loadingSongProgressBar;
 	TextView loadingSongText;
+	int currentapiVersion = android.os.Build.VERSION.SDK_INT;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		t = this;
-		setContentView(R.layout.activity_remote_control);
+		if (currentapiVersion >= android.os.Build.VERSION_CODES.ICE_CREAM_SANDWICH){
+			setContentView(R.layout.activity_remote_control);
+		}else{
+			setContentView(R.layout.activity_remote_control_old);
+		}
+		
 		play = (Button) findViewById(R.id.buttonPlay);
 		next = (Button) findViewById(R.id.buttonNext);
 		like = (Button) findViewById(R.id.buttonLike);
 		dislike = (Button) findViewById(R.id.buttonDislike);
 		currentSongAmazonID = "";
-		ipport = (EditText) findViewById(R.id.ipandportvalue);
+		ipport = (TextView) findViewById(R.id.ipandportvalue);
+		ipport.setText(getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+				.getString("ElpisIp", ""));
 		songAndArtist = (TextView) findViewById(R.id.songAndArtist);
 		progressBar = (ProgressBar) findViewById(R.id.ProgressBar);
 		playPauseProgressBar = (ProgressBar) findViewById(R.id.playPauseProgessBar);
@@ -132,20 +144,6 @@ public class RemoteControl extends Activity implements AsyncResponse {
 				new RequestTask().execute("dislike", new String());
 			}
 		});
-		ipport.setImeActionLabel("Set IP", KeyEvent.KEYCODE_ENTER);
-		ipport.setOnEditorActionListener(new OnEditorActionListener() {
-
-			@Override
-			public boolean onEditorAction(TextView v, int actionId,
-					KeyEvent event) {
-				if (actionId == KeyEvent.KEYCODE_ENTER) {
-					ip = ipport.getText().toString();
-					Log.d("Setting ip", ip);
-					connect();
-				}
-				return false;
-			}
-		});
 		ScheduledExecutorService scheduler = Executors
 				.newSingleThreadScheduledExecutor();
 
@@ -166,8 +164,38 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			}
 		}, 0, 2, TimeUnit.SECONDS);
 
+		if (ipport.getText().toString().equals("")){
+			showSetIpDialog(null);
+		}
 	}
-
+	
+	public void showSetIpDialog(View v){
+		FragmentTransaction ft = getFragmentManager().beginTransaction();
+	    Fragment prev = getFragmentManager().findFragmentByTag("ip_set_dialog");
+	    if (prev != null) {
+	        ft.remove(prev);
+	    }
+	    ft.addToBackStack(null);
+		SetIpDialog d = new SetIpDialog(this);
+		d.show(ft, "ip_set_dialog");
+	}
+	
+	public void setIpAndConnect(final String ip){
+		this.ip = ip;
+		runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				ipport.setText(ip);
+				Log.d("Setting ip", ip);
+				connect();
+			}
+		});	
+		if (currentapiVersion >= android.os.Build.VERSION_CODES.GINGERBREAD){
+			getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+			.putString("ElpisIp", ip).apply();
+		}
+	}
+	
 	public void toggleGUIElements(final boolean setAsVisible,
 			final View... views) {
 		if (views[0].getVisibility() != (setAsVisible ? View.VISIBLE
@@ -185,6 +213,7 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		}
 	}
 
+	@SuppressLint("NewApi")
 	public void checkFirstRun() {
 		boolean isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
 				.getBoolean("isFirstRun", true);
@@ -204,9 +233,13 @@ public class RemoteControl extends Activity implements AsyncResponse {
 			AlertDialog dialog = builder.create();
 			dialog.show();
 
-			if (Statistics.sendAnonymousStatistics(this))
-				getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-						.putBoolean("isFirstRun", false).apply();
+			if (Statistics.sendAnonymousStatistics(this)){
+				if (currentapiVersion >= android.os.Build.VERSION_CODES.GINGERBREAD){
+					getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+					.putBoolean("isFirstRun", false).apply();
+				}
+				
+			}
 		}
 	}
 
@@ -329,6 +362,8 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		protected String doInBackground(String... uri) {
 			this.command = uri[0];
 			if (connected || command.equals("connect")) {
+				if (ip.equals(""))
+					return null;
 				Log.d("Command:ip", command + ":" + ip);
 				HttpParams httpParams = new BasicHttpParams();
 				HttpConnectionParams.setConnectionTimeout(httpParams, 100);
@@ -378,13 +413,16 @@ public class RemoteControl extends Activity implements AsyncResponse {
 		return true;
 	}
 
+	@SuppressLint("NewApi")
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle presses on the action bar items
 		switch (item.getItemId()) {
 		case R.id.updateSongInfo:
 			forceUpdate = true;
-			getActionBar();
+			if (currentapiVersion >= android.os.Build.VERSION_CODES.HONEYCOMB){
+				getActionBar();
+			}			
 			return true;
 		case R.id.listen:
 			listen = !item.isChecked();

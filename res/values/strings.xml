@@ -4,7 +4,7 @@
     <string name="app_name">ElpisRemote</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="ip_port_label">Your IP</string>
+    <string name="ip_port_label">Set IP</string>
     <string name="ip_port">192.168.1.64</string>
     <string name="play_button_string">Playing</string>
     <string name="pause_button_string">Paused</string>
