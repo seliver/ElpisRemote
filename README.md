@@ -13,9 +13,14 @@ It is built on Java using the [Eclipse](https://eclipse.org/) IDE.
  * Listen to what's playing on your PC on the Phone
 
 ## Requirements
- * Minimum SDK version - 6 (Android 2.0.1)
+ * Minimum SDK version - 14 (Android 4.0)
  * Java installed on your computer to run Eclipse
  * Android Development Tools for Eclipse installed
+ * 
+
+## Download
+Make sure you have enabled the installation of apk files from Unknown Sources.
+Then, go [here](https://github.com/seliver/ElpisRemote/releases) and download the latest apk available. After that, install and have fun!
 
 ## Other Links
  * [Elpis](https://github.com/adammhaile/Elpis) - Elpis is native Windows client for the Pandora Radio music service, implemented in C# and WPF.  
